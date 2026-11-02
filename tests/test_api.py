@@ -70,3 +70,19 @@ def test_list_filters_by_done(flag, expected):
     client.post(f"/todos/{a['id']}/complete")
     r = client.get(f"/todos?done={flag}")
     assert [i["title"] for i in r.json()] == expected
+
+
+def test_move_returns_the_new_order():
+    a, b = make("a").json(), make("b").json()
+    r = client.post(f"/todos/{b['id']}/move", json={"before": a["id"]})
+    assert r.status_code == 200
+    assert [i["title"] for i in r.json()] == ["B", "A"]
+
+
+def test_move_unknown_is_404():
+    assert client.post("/todos/99/move", json={}).status_code == 404
+
+
+def test_move_before_itself_is_422():
+    a = make("a").json()
+    assert client.post(f"/todos/{a['id']}/move", json={"before": a["id"]}).status_code == 422

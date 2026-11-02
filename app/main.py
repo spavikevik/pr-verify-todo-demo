@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 
 from app import service
-from app.models import Item, ItemCreate
+from app.models import Item, ItemCreate, Move
 
 app = FastAPI(title="Todo demo")
 
@@ -50,6 +50,16 @@ def complete_todo(item_id: int) -> Item:
 def delete_todo(item_id: int) -> None:
     try:
         service.delete_item(item_id)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except KeyError:
+        raise HTTPException(status_code=404, detail="todo not found")
+
+
+@app.post("/todos/{item_id}/move")
+def move_todo(item_id: int, body: Move) -> list[Item]:
+    try:
+        return service.move_item(item_id, body.before)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:

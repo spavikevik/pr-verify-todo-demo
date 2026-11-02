@@ -12,3 +12,7 @@ class Item(BaseModel):
 
 class ItemCreate(BaseModel):
     title: str
+
+
+class Move(BaseModel):
+    before: int | None = None

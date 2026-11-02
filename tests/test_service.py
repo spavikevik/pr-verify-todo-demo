@@ -95,3 +95,37 @@ def test_concurrent_creates_get_distinct_ids():
     for t in threads:
         t.join()
     assert sorted(ids) == list(range(1, 21))
+
+
+def titles():
+    return [i.title for i in service.list_items()]
+
+
+def test_move_before_another():
+    a, b, c = (service.create_item(t) for t in ("a", "b", "c"))
+    service.move_item(c.id, a.id)
+    assert titles() == ["C", "A", "B"]
+
+
+def test_move_to_the_end():
+    a, b = (service.create_item(t) for t in ("a", "b"))
+    service.move_item(a.id, None)
+    assert titles() == ["B", "A"]
+
+
+def test_move_unknown_raises_key_error():
+    a = service.create_item("a")
+    with pytest.raises(KeyError):
+        service.move_item(a.id, 99)
+
+
+def test_move_before_itself_is_rejected():
+    a = service.create_item("a")
+    with pytest.raises(ValueError):
+        service.move_item(a.id, a.id)
+
+
+def test_deleted_todos_leave_the_order():
+    a, b = (service.create_item(t) for t in ("a", "b"))
+    service.delete_item(a.id)
+    assert titles() == ["B"]
