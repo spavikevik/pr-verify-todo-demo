@@ -1,4 +1,5 @@
 import threading
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -95,3 +96,24 @@ def test_concurrent_creates_get_distinct_ids():
     for t in threads:
         t.join()
     assert sorted(ids) == list(range(1, 21))
+
+
+def test_create_keeps_the_due_date():
+    due = datetime(2026, 12, 1, tzinfo=timezone.utc)
+    assert service.create_item("Pay rent", due).due_at == due
+
+
+def test_list_filters_overdue():
+    now = datetime(2026, 11, 10, tzinfo=timezone.utc)
+    service.create_item("late", now - timedelta(days=1))
+    service.create_item("soon", now + timedelta(days=1))
+    service.create_item("someday")
+    assert [i.title for i in service.list_items(overdue=True, now=now)] == ["Late"]
+    assert [i.title for i in service.list_items(overdue=False, now=now)] == ["Soon", "Someday"]
+
+
+def test_done_todos_are_never_overdue():
+    now = datetime(2026, 11, 10, tzinfo=timezone.utc)
+    item = service.create_item("late", now - timedelta(days=1))
+    service.complete_item(item.id)
+    assert service.list_items(overdue=True, now=now) == []
