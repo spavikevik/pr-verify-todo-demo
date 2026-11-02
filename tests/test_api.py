@@ -18,6 +18,10 @@ def test_create_returns_201_and_the_item():
     assert r.json()["done"] is False
 
 
+def test_create_with_blank_title_is_422():
+    assert make("   ").status_code == 422
+
+
 def test_create_without_title_is_422():
     assert client.post("/todos", json={}).status_code == 422
 

@@ -9,6 +9,8 @@ MAX_TITLE = 200
 
 def clean_title(title: str) -> str:
     title = title.strip()
+    if not title:
+        raise ValueError("title must not be empty")
     if len(title) > MAX_TITLE:
         raise ValueError(f"title must be at most {MAX_TITLE} characters")
     # Titles start with a capital letter, so lists read the same way.

@@ -24,6 +24,12 @@ def test_create_rejects_a_long_title():
         service.create_item("x" * 201)
 
 
+@pytest.mark.parametrize("title", ["", "   "])
+def test_create_rejects_an_empty_title(title):
+    with pytest.raises(ValueError):
+        service.create_item(title)
+
+
 def test_create_capitalizes_the_title():
     assert service.create_item("buy milk").title == "Buy milk"
 
