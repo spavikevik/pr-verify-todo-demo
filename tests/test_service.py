@@ -95,3 +95,22 @@ def test_concurrent_creates_get_distinct_ids():
     for t in threads:
         t.join()
     assert sorted(ids) == list(range(1, 21))
+
+
+def test_search_ignores_case():
+    service.create_item("Buy milk")
+    service.create_item("Walk the dog")
+    assert [i.title for i in service.list_items(q="MILK")] == ["Buy milk"]
+
+
+def test_search_and_done_filter_combine():
+    a = service.create_item("Buy milk")
+    service.create_item("Buy bread")
+    service.complete_item(a.id)
+    assert [i.title for i in service.list_items(done=False, q="buy")] == ["Buy bread"]
+
+
+def test_an_empty_search_lists_everything():
+    service.create_item("a")
+    service.create_item("b")
+    assert len(service.list_items(q="")) == 2
