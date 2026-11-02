@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from app.models import Item
+from app.models import Todo
 from app.settings import PAGE_SIZE
 from app.store import store
 
@@ -15,15 +15,15 @@ def clean_title(title: str) -> str:
     return title[0].upper() + title[1:]
 
 
-def create_item(title: str) -> Item:
+def create_item(title: str) -> Todo:
     return store.add(clean_title(title), datetime.now(timezone.utc))
 
 
-def get_item(item_id: int) -> Item:
+def get_item(item_id: int) -> Todo:
     return store.get(item_id)
 
 
-def list_items(page: int = 1, done: bool | None = None) -> list[Item]:
+def list_items(page: int = 1, done: bool | None = None) -> list[Todo]:
     if page < 1:
         raise ValueError("page must be 1 or more")
     items = store.list()
@@ -33,7 +33,7 @@ def list_items(page: int = 1, done: bool | None = None) -> list[Item]:
     return items[start : start + PAGE_SIZE]
 
 
-def complete_item(item_id: int) -> Item:
+def complete_item(item_id: int) -> Todo:
     item = store.get(item_id)
     return store.update(item.model_copy(update={"done": True}))
 
