@@ -95,3 +95,8 @@ def test_concurrent_creates_get_distinct_ids():
     for t in threads:
         t.join()
     assert sorted(ids) == list(range(1, 21))
+
+
+def test_complete_many_marks_each_done():
+    ids = [service.create_item(t).id for t in ("a", "b", "c")]
+    assert all(i.done for i in service.complete_many(ids))

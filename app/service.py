@@ -40,3 +40,7 @@ def complete_item(item_id: int) -> Item:
 
 def delete_item(item_id: int) -> None:
     store.delete(item_id)
+
+
+def complete_many(ids: list[int]) -> list[Item]:
+    return [complete_item(item_id) for item_id in ids]
