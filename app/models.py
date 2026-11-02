@@ -8,7 +8,9 @@ class Item(BaseModel):
     title: str
     done: bool
     created_at: datetime
+    tags: list[str] = []
 
 
 class ItemCreate(BaseModel):
     title: str
+    tags: list[str] = []
