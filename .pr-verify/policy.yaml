@@ -1,0 +1,10 @@
+every-pr:
+  - add-packages: promised-only
+  - done-when: { check: { ci: "test" } }
+when-changes:
+  - paths: ["app/store.py"]
+    then: { tests-added: { about: "the store change" } }
+  - public-api: true
+    then: { files-changed: ["CHANGELOG.md"] }
+  - categories: [concurrency]
+    then: { check: { text: "Run two bulk completes at once; no todo is lost or doubled", when: before-merge } }

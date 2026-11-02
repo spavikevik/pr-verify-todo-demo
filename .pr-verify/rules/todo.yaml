@@ -1,0 +1,12 @@
+rules:
+  - id: todo.no-print
+    languages: [python]
+    severity: WARNING
+    message: print() in app code goes nowhere useful. Use logging.
+    pattern: print(...)
+
+  - id: todo.naive-now
+    languages: [python]
+    severity: WARNING
+    message: datetime.now() without a timezone gives local time. Pass timezone.utc.
+    pattern: datetime.now()
