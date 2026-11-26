@@ -1,0 +1,5 @@
+claims:
+  - id: api-examples
+    kind: docs-only
+    text: Add a request and response example for every route
+    scope: { paths: ["docs/**"] }
