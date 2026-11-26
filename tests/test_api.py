@@ -70,3 +70,10 @@ def test_list_filters_by_done(flag, expected):
     client.post(f"/todos/{a['id']}/complete")
     r = client.get(f"/todos?done={flag}")
     assert [i["title"] for i in r.json()] == expected
+
+
+def test_create_with_tags_and_list_by_tag():
+    client.post("/todos", json={"title": "Buy milk", "tags": ["home"]})
+    client.post("/todos", json={"title": "Send report", "tags": ["work"]})
+    r = client.get("/todos", params={"tag": "work"})
+    assert [t["title"] for t in r.json()] == ["Send report"]

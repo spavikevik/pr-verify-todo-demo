@@ -7,9 +7,9 @@ app = FastAPI(title="Todo demo")
 
 
 @app.get("/todos")
-def list_todos(page: int = 1, done: bool | None = None) -> list[Item]:
+def list_todos(page: int = 1, done: bool | None = None, tag: str | None = None) -> list[Item]:
     try:
-        return service.list_items(page, done)
+        return service.list_items(page, done, tag)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
@@ -19,7 +19,7 @@ def list_todos(page: int = 1, done: bool | None = None) -> list[Item]:
 @app.post("/todos", status_code=201)
 def create_todo(body: ItemCreate) -> Item:
     try:
-        return service.create_item(body.title)
+        return service.create_item(body.title, body.tags)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:

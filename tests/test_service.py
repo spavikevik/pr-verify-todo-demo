@@ -95,3 +95,23 @@ def test_concurrent_creates_get_distinct_ids():
     for t in threads:
         t.join()
     assert sorted(ids) == list(range(1, 21))
+
+
+def test_a_todo_has_no_tags_unless_given():
+    assert service.create_item("a").tags == []
+
+
+def test_tags_are_trimmed_lowercased_and_unique():
+    assert service.create_item("a", [" Home", "home", "", "work "]).tags == ["home", "work"]
+
+
+def test_list_by_tag():
+    service.create_item("Buy milk", ["home"])
+    service.create_item("Send report", ["work"])
+    assert [i.title for i in service.list_items(tag="HOME")] == ["Buy milk"]
+
+
+def test_a_deleted_todo_leaves_its_tags():
+    item = service.create_item("a", ["home"])
+    service.delete_item(item.id)
+    assert service.list_items(tag="home") == []
