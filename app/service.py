@@ -40,3 +40,10 @@ def complete_item(item_id: int) -> Item:
 
 def delete_item(item_id: int) -> None:
     store.delete(item_id)
+
+
+def move_item(item_id: int, before: int | None) -> list[Item]:
+    if item_id == before:
+        raise ValueError("a todo can't move before itself")
+    store.move(item_id, before)
+    return store.list()
