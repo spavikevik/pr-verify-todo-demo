@@ -70,3 +70,14 @@ def test_list_filters_by_done(flag, expected):
     client.post(f"/todos/{a['id']}/complete")
     r = client.get(f"/todos?done={flag}")
     assert [i["title"] for i in r.json()] == expected
+
+
+def test_bulk_complete():
+    ids = [make(t).json()["id"] for t in ("a", "b")]
+    r = client.post("/todos/complete", json={"ids": ids})
+    assert r.status_code == 200
+    assert [i["done"] for i in r.json()] == [True, True]
+
+
+def test_bulk_complete_unknown_is_404():
+    assert client.post("/todos/complete", json={"ids": [99]}).status_code == 404

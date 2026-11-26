@@ -1,7 +1,8 @@
+import anyio
 from fastapi import FastAPI, HTTPException
 
 from app import service
-from app.models import Item, ItemCreate
+from app.models import BulkComplete, Item, ItemCreate
 
 app = FastAPI(title="Todo demo")
 
@@ -24,6 +25,14 @@ def create_todo(body: ItemCreate) -> Item:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
         raise HTTPException(status_code=404, detail="todo not found")
+
+
+@app.post("/todos/complete")
+async def complete_todos(body: BulkComplete) -> list[Item]:
+    try:
+        return await anyio.to_thread.run_sync(service.complete_many, body.ids)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=f"todo {e.args[0]} not found")
 
 
 @app.get("/todos/{item_id}")

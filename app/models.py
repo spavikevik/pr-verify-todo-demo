@@ -12,3 +12,7 @@ class Item(BaseModel):
 
 class ItemCreate(BaseModel):
     title: str
+
+
+class BulkComplete(BaseModel):
+    ids: list[int]
