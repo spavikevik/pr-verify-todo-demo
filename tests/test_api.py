@@ -70,3 +70,11 @@ def test_list_filters_by_done(flag, expected):
     client.post(f"/todos/{a['id']}/complete")
     r = client.get(f"/todos?done={flag}")
     assert [i["title"] for i in r.json()] == expected
+
+
+def test_list_with_q_searches_titles():
+    make("Buy milk")
+    make("Walk the dog")
+    r = client.get("/todos", params={"q": "milk"})
+    assert r.status_code == 200
+    assert [t["title"] for t in r.json()] == ["Buy milk"]

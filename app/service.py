@@ -23,12 +23,15 @@ def get_item(item_id: int) -> Item:
     return store.get(item_id)
 
 
-def list_items(page: int = 1, done: bool | None = None) -> list[Item]:
+def list_items(page: int = 1, done: bool | None = None, q: str | None = None) -> list[Item]:
     if page < 1:
         raise ValueError("page must be 1 or more")
     items = store.list()
     if done is not None:
         items = [i for i in items if i.done == done]
+    if q:
+        needle = q.casefold()
+        items = [i for i in items if needle in i.title.casefold()]
     start = (page - 1) * PAGE_SIZE
     return items[start : start + PAGE_SIZE]
 

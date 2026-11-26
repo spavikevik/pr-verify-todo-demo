@@ -7,9 +7,9 @@ app = FastAPI(title="Todo demo")
 
 
 @app.get("/todos")
-def list_todos(page: int = 1, done: bool | None = None) -> list[Item]:
+def list_todos(page: int = 1, done: bool | None = None, q: str | None = None) -> list[Item]:
     try:
-        return service.list_items(page, done)
+        return service.list_items(page, done, q)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
