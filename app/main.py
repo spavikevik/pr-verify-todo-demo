@@ -1,15 +1,18 @@
+from datetime import datetime, timezone
+
 from fastapi import FastAPI, HTTPException
 
 from app import service
-from app.models import Item, ItemCreate
+from app.models import ItemCreate, ItemView
 
 app = FastAPI(title="Todo demo")
 
 
 @app.get("/todos")
-def list_todos(page: int = 1, done: bool | None = None) -> list[Item]:
+def list_todos(page: int = 1, done: bool | None = None, overdue: bool | None = None) -> list[ItemView]:
     try:
-        return service.list_items(page, done)
+        now = datetime.now(timezone.utc)
+        return [service.view(i, now) for i in service.list_items(page, done, overdue, now)]
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
@@ -17,9 +20,9 @@ def list_todos(page: int = 1, done: bool | None = None) -> list[Item]:
 
 
 @app.post("/todos", status_code=201)
-def create_todo(body: ItemCreate) -> Item:
+def create_todo(body: ItemCreate) -> ItemView:
     try:
-        return service.create_item(body.title)
+        return service.view(service.create_item(body.title, body.due_at), datetime.now())
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
@@ -27,9 +30,9 @@ def create_todo(body: ItemCreate) -> Item:
 
 
 @app.get("/todos/{item_id}")
-def get_todo(item_id: int) -> Item:
+def get_todo(item_id: int) -> ItemView:
     try:
-        return service.get_item(item_id)
+        return service.view(service.get_item(item_id), datetime.now(timezone.utc))
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
@@ -37,9 +40,9 @@ def get_todo(item_id: int) -> Item:
 
 
 @app.post("/todos/{item_id}/complete")
-def complete_todo(item_id: int) -> Item:
+def complete_todo(item_id: int) -> ItemView:
     try:
-        return service.complete_item(item_id)
+        return service.view(service.complete_item(item_id), datetime.now(timezone.utc))
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except KeyError:
